@@ -241,11 +241,20 @@ func caldavHandler(store *Store) http.Handler {
 					http.Error(w, "Internal Server Error", 500)
 					return
 				}
-				w.Header().Set("Content-Type", "text/plain")
+				w.Header().Set("Content-Type", "application/xml; charset=utf-8")
+				w.WriteHeader(207)
+				fmt.Fprint(w, xml.Header)
+				fmt.Fprint(w, `<d:multistatus xmlns:d="DAV:" xmlns:cal="urn:ietf:params:xml:ns:caldav">`)
 				for _, e := range events {
-					fmt.Fprintf(w, "%s: %s (%s - %s)\n", e.UID, e.SUMMARY, e.DTSTART, e.DTEND)
+					fmt.Fprint(w, `<d:response>`)
+					fmt.Fprintf(w, `<d:href>/calendar/%s%s</d:href>`, e.UID, FILEEXT)
+					fmt.Fprint(w, `<d:propstat><d:prop>`)
+					fmt.Fprintf(w, `<d:getetag>"%s"</d:getetag>`, e.UID)
+					fmt.Fprint(w, `</d:prop><d:status>HTTP/1.1 200 OK</d:status></d:propstat>`)
+					fmt.Fprint(w, `</d:response>`)
 				}
-				fmt.Fprintf(w, "\n# next sync-token: %d\n", newToken)
+				fmt.Fprintf(w, `<d:sync-token>%d</d:sync-token>`, newToken)
+				fmt.Fprint(w, `</d:multistatus>`)
 				return
 			}
 
@@ -261,12 +270,21 @@ func caldavHandler(store *Store) http.Handler {
 				http.Error(w, "Internal Server Error", 500)
 				return
 			}
-			w.Header().Set("Content-Type", "text/plain")
+			w.Header().Set("Content-Type", "application/xml; charset=utf-8")
+			w.WriteHeader(207)
+			fmt.Fprint(w, xml.Header)
+			fmt.Fprint(w, `<d:multistatus xmlns:d="DAV:" xmlns:cal="urn:ietf:params:xml:ns:caldav">`)
 			for _, e := range events {
 				if e.DTSTART <= end && e.DTEND >= start {
-					fmt.Fprintf(w, "%s: %s (%s - %s)\n", e.UID, e.SUMMARY, e.DTSTART, e.DTEND)
+					fmt.Fprint(w, `<d:response>`)
+					fmt.Fprintf(w, `<d:href>/calendar/%s%s</d:href>`, e.UID, FILEEXT)
+					fmt.Fprint(w, `<d:propstat><d:prop>`)
+					fmt.Fprintf(w, `<d:getetag>"%s"</d:getetag>`, e.UID)
+					fmt.Fprint(w, `</d:prop><d:status>HTTP/1.1 200 OK</d:status></d:propstat>`)
+					fmt.Fprint(w, `</d:response>`)
 				}
 			}
+			fmt.Fprint(w, `</d:multistatus>`)
 
 		default:
 			http.Error(w, "Method Not Allowed", 405)
