@@ -279,7 +279,7 @@ func caldavHandler(store *Store) http.Handler {
 			fmt.Fprint(w, xml.Header)
 			fmt.Fprint(w, `<d:multistatus xmlns:d="DAV:" xmlns:cal="urn:ietf:params:xml:ns:caldav">`)
 			for _, e := range events {
-				if e.DTSTART <= end && e.DTEND >= start {
+				if e.DTEND >= start && (end == "" || e.DTSTART <= end) {
 					fmt.Fprint(w, `<d:response>`)
 					fmt.Fprintf(w, `<d:href>/calendar/%s%s</d:href>`, e.UID, FILEEXT)
 					fmt.Fprint(w, `<d:propstat><d:prop>`)
