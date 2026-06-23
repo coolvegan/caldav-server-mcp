@@ -1,0 +1,18 @@
+[Unit]
+Description=CalDAV Server
+After=network.target
+
+[Service]
+Type=simple
+User=marco
+WorkingDirectory=/home/marco/go/src/gittea.kittel.dev/marco/caldav-server
+ExecStart=/home/marco/go/src/gittea.kittel.dev/marco/caldav-server/caldav-server
+Restart=always
+RestartSec=5
+Environment=CALDAV_DIR=/home/marco/go/src/gittea.kittel.dev/marco/caldav-server/calendar
+EnvironmentFile=-/etc/caldav-server/credentials.env
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
