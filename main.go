@@ -51,8 +51,12 @@ func main() {
 	user := os.Getenv("CALDAV_USER")
 	pass := os.Getenv("CALDAV_PASS")
 
-	log.Println("Server startet auf :8080")
-	log.Fatal(http.ListenAndServe(":8080", basicAuth(user, pass)(mux)))
+	port := os.Getenv("CALDAV_PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Println("Server startet auf :" + port)
+	log.Fatal(http.ListenAndServe(":"+port, basicAuth(user, pass)(mux)))
 }
 
 func xmlEscape(s string) string {
