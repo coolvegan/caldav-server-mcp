@@ -56,7 +56,11 @@ func main() {
 		port = "8080"
 	}
 	log.Println("Server startet auf :" + port)
-	log.Fatal(http.ListenAndServe(":"+port, basicAuth(user, pass)(mux)))
+	listenAddr := os.Getenv("CALDAV_LISTEN")
+	if listenAddr == "" {
+		listenAddr = "127.0.0.1:" + port
+	}
+	log.Fatal(http.ListenAndServe(listenAddr, basicAuth(user, pass)(mux)))
 }
 
 func xmlEscape(s string) string {

@@ -43,7 +43,10 @@ func runMCPSSE() {
 	)
 
 	port := "8081"
-	addr := ":" + port
+	if p := os.Getenv("CALDAV_MCP_PORT"); p != "" {
+		port = p
+	}
+	addr := "127.0.0.1:" + port
 	log.Println("MCP-Server gestartet (SSE) auf", addr)
 	log.Fatal(sseServer.Start(addr))
 }
